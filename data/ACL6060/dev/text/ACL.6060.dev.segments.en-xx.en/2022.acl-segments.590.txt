@@ -1,0 +1,66 @@
+Hello, my name is Michał Pietruszka and it is my pleasure to present to you the paper titled Sparsifying Transformer Models with Trainable Representation Pooling.
+A work done at Applica AI in cooperation with Lukasz Borchmann and Lukasz Garncarek.
+Let me start with the problems our work targets.
+Our method works well for the cases where long inputs are considered.
+Roughly speaking, it is meant for the task orders and input of over two thousand tokens and the targets are shorter than the provided inputs.
+This has some specific applications in NLP.
+For example, one can imagine that given a long document, there's a need to summarize it, classify, answer the question about it, extract information or some key phrases.
+Let me recall the vanilla transformer and our and its issue of its attention complexity that depends on the square of the input line.
+In the vanilla transformer, with full attention connectivity, relations of each token to every other token have to be calculated.
+The computational complexity of attention, this depends on the number of layers l, sequence length n, another sequence length, and the dimensionality of representations.
+Similarly, in the decoder's cross attention, to this picture on the right side, the only difference here is that the target tokens are attending to the input tokens in this case.
+Which can be seen also in this formula.
+The BLEU score represents relations that have to be calculated.
+In case of the full attention, we need to calculate every relations within the input sequence.
+Now, we see what happens when we have a blockwise encoder that works by limiting the tokens connectivity so that they can only see other nearby tokens.
+The text is read in chunks which can drastically reduce the number of computations on the encoder side, but does not improve the decoder's cross attention as every input token is passed to the decoder anyway.
+This method is often referred to as fusion in decoder.
+The improvement here can be interpreted as changing one of the dependencies of n to another constant m representing the block size.
+Our key observation is that most tokens are irrelevant for a wide variety of tasks and can be almost completely disregarded. This is exemplified on the slide.
+The only parts of the inputs are relevant to the desired output.
+For example.
+One can read an article once marking the most important parts with a highlighter, and then produce a summary based on this part from the middle stage only.
+The cost of highlighting and deciding if the current token is essential to produce the summary is thus cheap and depends only on the token's representation.
+The pooling of the highlighted tokens is possible.
+Thanks to our top k operator and its cost is negligible.
+The cost of producing a summary from a shortened input is also much lower than in the vanilla model when the whole input is considered.
+But here's a question.
+How to select important tokens and backpropagate gradients to that selection?
+The essential underlying problem that we solve is to propose the trainable selection mechanism.
+One that can allow for gradient to be back propagated during the training so that the network can learn to select the most important tokens.
+More precisely
+Given some embeddings underscore obtained from a simple linear layer, the task is to return the highest scoring embeddings. First, the sequence is permuted and pairs are prepared so that the higher scoring vector is taken with the lower scoring one.
+Next, weights are calculated using boosted softmax over scores.
+After each tournament round, new vectors and scores are composed as a linear combination of those pairs with the obtained weights.
+So in short, we combine them linearly by performing a softmax over their scores.
+And while combining two tokens, some noise can be produces produced.
+But it also allows the gradients to be propagated to all input embeddings.
+In short, a trainable top k we propose is based on performing a tournament like soft selection at each step.
+And from a different perspective, the representation pooling follows the encoder layer.
+First, each representation is scored and then only those with the highest scores are passed to the next layer.
+Encoding can be performed as in standard transformer architecture on the full length input.
+It is however possible to process text in blocks of fixed length of fixed length and globally select the best representation.
+Here is an example of the representation pooling introduced after the encoder.
+This directly influenced the cause of cross attention, which depends not on the input length N, but the constant K, representing the pooled length.
+This constant informs how many representations are selected and passed to the decoder.
+Producing a summary from a shorter text is significantly cheaper than previous solution.
+As the sequence length can be shortened by a large factor.
+For example, we successfully used k of sixteen or even sixty times four or even sixty four times smaller than the value of n in our experiments.
+Please note that the beneficial impact of blockwise encoding and self attention is sustained.
+Remember that the computational cost of attention depend on the square of the input length.
+Reducing it the input earlier during the encoding process can significantly lower the costs.
+For the pyramidion model, we narrowed down the size of the representation on the output of each of each chosen layer, leading to the exponential reduction of computational cost as the encoding proceeds.
+As you can see, the total computational cost of a full encoder here is less than two times the cost of the full-sized first layer.
+When pooling is introduced earlier, the sum of all purple squares is thus bounded to a constant, not dependent on the number of layers l.
+But on the constant c, which can be influenced by the placing of the pooling layers within the network.
+Our improvements were benchmarked on eight thousand tokens long inputs.
+And the figure shows that when pooling is engaged, the best scalability for the network's depth is achieved.
+Here one can note that training the pyramidion of twenty four layers can be cheaper than training a two layer vanilla transformer on such long inputs.
+Not to mention how easily vanilla transformer can go out of memory for such a long input.
+The qual quality qual qualitative comparison of our trend pyramidion to other baseline is performed on the long document summarization task, or given the body of an article from arXiv or PubMed, the task is to generate its abstract.
+Thus, one can see blockwise, which is our baseline, performs on the level of the re, recent state-of-the-art models, while the pyramidion retains or improves the performance of this competitive baseline.
+At the same time, our model is eighty percent faster to train and over four hundred fifty percent faster at inference when compared to the blockwise baseline.
+Both models have much lower parameter counts and were trained from scratch on the chosen tasks.
+Previous approaches to to achieve a similar performance had to use more parameters and leverage pretrained foundation foundational models and additional language pretraining objective to achieve similar performance.
+We invite you to read our full paper and use our GitHub code.
+Thank you for watching.

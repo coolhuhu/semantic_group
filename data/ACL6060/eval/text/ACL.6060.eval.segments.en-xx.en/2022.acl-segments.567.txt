@@ -1,0 +1,56 @@
+Hello, we are happy to present our work on VALSE; a Task-Independent Benchmark meant for testing vision and language models with specific linguistic phenomena.
+Why did we do the trouble in setting up this benchmark?
+Well, during the last years, we have seen an explosion of transformer based vision and language models pretrained on large amounts of image text pairs.
+Each one of these models pushes state-of-the-art on vision and language tasks such as visual question answering, visual common sense reasoning, image retrieval, phrase grounding.
+So we got a message, the accuracies on these tasks and specific benchmarks are increasing steadily.
+But do we know what the models have actually learned?
+What is it that a vision and language transformer understood when assigning a high score for this image and this sentence to match?
+And the low score for this one?
+Do vision and language models focus on the right thing?
+Or do they focus on biases as shown by previous work?
+To shed more light on this aspect, we propose a more task agnostic direction and introduce VALSE that tests the sensitivity of vision and language models to specific linguistic phenomena that affect both the linguistic and the visual modalities.
+We target existence, plurality, counting, spatial relations, actions and entity coreference.
+But how do we test whether the vision and language models have captured this phenomena?
+By foiling a method previously applied for vision and language models only for noun phrases by Ravi Shekhar and collaborators, and on counting by us in previous work.
+Foiling basically means that we take the caption of an image and produce a foil by altering the caption such that it does not describe the image anymore.
+And we do these phrase alterations by focusing on six specific pieces such as existence, plurality, counting, spatial relations, actions and entity coreference, where each piece can consist of one or more instruments, in case we found more than one interesting way to create foil instances.
+For example, in the case of the actions piece, we have two instruments, one in which the action verb is changed with a different action, and one in which actants are swapped.
+Counting and coreference also are pieces that have more than one instrument.
+And we create these foils by making sure that they fail to describe the image, that they are grammatical, and otherwise valid sentences.
+This is not easy to do because a foiled caption may be less likely than the original caption.
+For example, though it's not impossible, it is statistically less likely for plants to cut a man than a man to cut plants, and large vision and language models could pick up on this.
+Therefore, to obtain valid foils, we must take action.
+First, we make use of strong language models to propose foils.
+Second, we use natural language inference or short NLI to filter out foils that could be still describing the image, since when constructing foils we need to ensure that they fail to describe the image.
+To test this automatically, we apply natural language inference with the following rationale.
+We consider an image to be the premise and its caption its entailed hypothesis.
+In addition, we consider the caption to be the premise, and the foil is its hypothesis.
+If an NLI model predicts the foil to contradict or to be neutral with respect to the caption, we take this as an indicator of a valid foil.
+If an NLI predicts the foil to be entailed by the caption, it cannot be a good foil, since by transitivity it will give a truthful description of the image, and we filter these foils out.
+But this procedure is not perfect, it is just an indicator for valid foils.
+Therefore, as a third measure for generating valid foils, we employ human annotators to validate the data used in VALSE.
+So, after filtering and human evaluation, we have as many test instances as described in this table.
+Note that VALSE does not deliver any training data but only test data.
+Since it is a zero shot testing benchmark only, it is designed to leverage the existing capabilities of vision and language models after pretraining.
+Finetuning would only enable models to exploit artifacts or statistical biases in the data.
+And we all know that these models like to cheat and take shortcuts.
+And as we said, we are interested in assessing what capabilities the vision and language models have after pretraining.
+We experiment with five vision and language models on VALSE, namely with CLIP, LXMert, ViLBERT, ViLBERT twelve in one, and VisualBERT.
+Two of our most important evaluation metrics are the accuracy of the models in classifying image sentence pairs into captions and foils.
+Perhaps more relevant for this video, we will showcase our more permissive metric, the pairwise accuracy, which measures whether the image sentence alignment score is greater for the correct image text pair than for its foiled pair.
+For more metrics and results on them, do check out our paper.
+The results with pairwise accuracy are shown here and they are consistent with the results we got from the other metrics is that the best zero shot performance is achieved by ViLBERT twelve in one, followed by ViLBERT, LXMert, CLIP, and finally VisualBERT.
+It's notable how instruments centered on the individual objects like existence and noun phrases are almost solved by ViLBERT twelve in one, highlighting that models are capable of identifying named objects and their presence in images.
+However, none of the remaining pieces can be reliably solved in our adversarial foiling settings.
+We see from the plurality and counting instruments that vision and language models have trouble distinguishing references to single versus multiple objects, or counting them in an image.
+The relation piece shows that they have difficulties in correctly classifying a named spatial relation between objects in an image.
+They also have trouble distinguishing actions and identifying their participants, even if supported by plausibility biases as we see in the actions piece.
+From the coreference piece, we find out that tracing multiple references to the same object in an image by using pronouns is also difficult for vision and language models.
+As a sanity check, and because it's an interesting experiment, we also benchmark two text only models, GPT one and GPT two, to assess whether VALSE is solvable by these unimodal models by computing the perplexity of the correct and the foiled caption, no image here, and predicting the entry with the lowest perplexity.
+If the perplexity is higher for the foil, we take this as an indication that the foiled caption may suffer from plausibility bias or other linguistic biases.
+And it's interesting to see that in some cases, the text only GPT models have captured the plausibility of the world better than the vision and language models.
+So to sum up, VALSE is a benchmark that uses the lens of linguistic constructs to help the community improve vision and language models by hard testing their visual grounding capabilities.
+Our experiments show that vision and language models identify named objects and their presence in images well, as shown by the existence piece, but struggle to ground their interdependence and relationships in visual scenes when forced to respect linguistic indicators.
+We would really like to encourage the community to use VALSE for measuring progress towards language grounding with vision and language models.
+And even more, VALSE could be used as an indirect assessment of datasets, as models could be evaluated before and after training or finetuning to see whether a dataset helps models improve on any of the aspects tested by VALSE.
+If you're interested, do check out the VALSE data on GitHub, and if you have any questions do not hesitate to contact us.

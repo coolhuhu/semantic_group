@@ -1,0 +1,91 @@
+Hello, my name is Kamezawa from the University of Tokyo.
+I'll be presenting a paper entitled RNSum: A Large-Scale Dataset for Automatic Release Note Generation via Commit Logs Summarization.
+I'll be explaining in this order.
+First, I will introduce automatic release note generation that we are working on in this research.
+A release note is a technical document that summarizes the changes distributed with each release of a software product.
+The image shows a release note for version two point six point four of the vuejs library.
+Release notes play an important role in open source development but they're time consuming to prepare manually.
+Therefore, it would be very useful to be able to automatically generate high quality release notes.
+I will defer to two previous researches on automatic release note generation.
+The first is a system called ARENA released in twenty fourteen.
+It takes a rule-based approach, for example using the change extractor to extract all differences, library changes and document changes from the differences between releases, and finally combining them.
+The most notable feature of this system is the issue extractor in the upper right corner.
+Which must be left to Jira, the issue tracker system, and can only be applied to projects that use Jira.
+In other words, it cannot be used for many projects on GitHub.
+The second is Glyph, recently announced in twenty twenty.
+It is available on the internet and can be installed via pip.
+This system has a simple learning based text classification model and outputs one of five labels such as features or bug fixes for each input commit message.
+This image is a sample usage that returns a corrective or bug fixes label.
+Glyph's training data is fairly small, about five thousand, and will be shown in the experiments described below.
+The performance of the text classification model is not high.
+I present two related researches, but their problems are limited applicability and scarce data resources.
+Our paper solves these two problems and automatically generates high quality release notes.
+With a limited applicability problem, we propose a high quality classwise summarization method using only commit messages as input.
+This proposed method can be used for all English repositories.
+For the second problem of scarce data resources, we built our RNSum dataset consisting of about eighty two thousand pieces of data by collecting data from public GitHub repositories using the GitHub API.
+Next, I'll describe our dataset.
+Here is an example of data.
+The left side is a commit message and the right side is the release notes.
+Release notes are labeled as improvements or fixes, etc.
+We have set up a task that takes the commit messages as input and outputs a labeled release notes.
+This can be regarded as a summarization task.
+We have predefined four labels: features, improvements, bug fixes, deprecations removals and breaking changes.
+These were set based on previous research and other factors.
+The release note on the bottom right is extracted from the release note on the bottom left.
+At this time, it is necessary to detect the four labels that have been set up in advance.
+But the labels are not always consistent with each repository.
+For example, the improvements label includes improvements, enhancements, optimizations, and so on.
+We prepared a vocabulary list of about thirty labels for each of these notational variations.
+This is to detect the release note class, and collects the text of the release that follows as the release note sentence for the class.
+Next is a commit message.
+Commit messages are not tied to each release.
+As shown in the image below, if the current release is version two point five to nineteen, we need to identify the previous release version two point five to eighteen and get a diff.
+This is a bit tedious and it is not enough to just get a list of releases and look at the before and after.
+We created a heuristic matching rule to get the previous and next versions.
+Dataset analysis.
+In the end, seven thousand two hundred repositories and eighty two thousand pieces of data were collected.
+Also, the average number of release notes tokens is sixty three, which is quite high for a summarization task.
+Also, the number of unique tokens is quite large at eight thousand eight hundred thirty thousand.
+This is due to the large number of unique class or method names found in the repository.
+Next, I will explain the proposed method.
+The classwise extractive then abstractive summarization model consists of two neural modules.
+A classifier using BERT or CodeBERT and a generator using BART.
+First, CEAS uses a classifier to classify each commit message into five release notes classes, which use improvements, bug fixes, deprecations, plus an other.
+The commit messages classified as other are discarded.
+Then CEAS applies the generator to the four labeled documents independently and generates release notes for each class.
+In this task, the direct correspondences between commit messages and release notes are not known.
+Therefore, to train the classifier, that's why we reassigned surveys to each input commit message using the first ten characters of each commit message.
+We modeled the classwise abstractive summarization approach by two different methods.
+The first model, which we call CAS-Single, consists of a single six to six network and generates a single release note text give a concatenation of input commit messages.
+The output texts can be divided into classwise segments based on special class-specific endpoint symbols.
+The second method, method, which we call CAS-Multi, consists of four different seq2seq networks, each of which correspond to one of the fixed release note classes.
+Okay, let me explain the experiments.
+Five methods were compared: CEAS, CAS-Single, CAS-Multi, Clustering, and previous study, Glyph.
+Regarding evaluation, in some cases, release notes are output in multiple sentences.
+Since it is difficult to calculate the number of sentences as they are, they are combined with spaces and treated as one long sentence.
+The BLEU is penalized when the system outputs a short sentence.
+This penalty results in a lower BLEU value in the experiment results described next.
+Finally, we also calculate the specificity because ROUGE and BLEU cannot be calculated if the release notes are empty.
+A higher specificity means that the model correctly outputs an empty text in cases where the release notes assume empty.
+Here are the results.
+Since the dataset contains e-mail addresses, hashed values, etc, we also evaluated the cleaned dataset, which excludes them.
+CEAS and CAS achieved ROUGE-L scores more than ten points higher than the baselines.
+In particular, on the clean test set, the score gap between the proposed method and the baselines jumped to more than twenty points.
+These results indicate that CEAS and CAS are significantly affected.
+CEAS got a better ROUGE-L score than CAS suggesting that combining a classifier and a generator is effective on training the classifier using pseudo labels.
+High coverage of CEAS can be achieved probably because the classifier can focus on selecting relevant commit messages for each class.
+CAS-Multi tended to yield higher ROUGE-L than CAS-Single.
+Suggesting that it is also effective to independently develop differently abstractive summarization models for each release note class.
+Here are an error analysis.
+CAS methods tend to output shorter sentences than human reference sentences.
+In the figure on the right, the reference sentence has three or four sentences, while CAS has only one.
+The reason for this model's reluctance is that in training data, only thirty three percent of the sentences are present in the features label and forty percent in the improvements label.
+Furthermore, CAS methods cannot generate accurate release notes without additional information.
+The top example on the right is an example of a very messy commit message, and the complete sentence cannot be generated without reference to the corresponding progress or issue.
+The example below shows that the two commit messages in the input are related and should be combined into one sentence, but it fails to do so.
+Finally, a conclusion.
+We have built a new dataset for automatic release note generation.
+We have also formulated a task of entering commit messages and summarizing them so that it is applicable to all projects written in English.
+Our experiments show that the proposed method generates less noisy release notes at higher coverage than the baselines.
+Please check out our dataset on GitHub.
+Thank you.

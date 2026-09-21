@@ -1,0 +1,82 @@
+My name is Antoine.
+I'm a PhD student at the University of Massachusetts Amherst.
+I am presenting our paper KinyaBERT: a Morphology-aware Kinyarwanda Language Model.
+Today, I'll talk about the motivation for this research.
+Then I'll present KinyaBERT model architecture in detail.
+I'll then talk about our experimental results, then finish with some conclusions.
+We all know that recent natural language processing advances have been made possible by the use of pretrained language models such as BERT.
+However, there are still a number of limitations.
+Due to the complex morphology that is expressed by most morphologically rich languages, the ubiquitous byte pair encoding tokenization algorithm that I used cannot extract the exact subword lexical units, meaning the morphemes, which are needed for effective representation.
+For example, here we have three Kinyarwanda words that have several morphemes in them, but the BPE algorithms cannot extract them.
+This is because some morphological rules produce different surface forms that hide the exact lexical information, and BPE, which is solely based on the surface forms, does not have access to this lexical model.
+The second challenge is that even if one had access to an oracle morphological analyzer, replacing BPE tokens with morphemes is not enough to express the morphological compositionality.
+A third gap in the research is that new pretrained language models are most often evaluated on high resource languages.
+And we need to assess their applicability on low resources and diverse languages as well.
+Therefore, we present KinyaBERT, which is a simple but effective adaptation of the BERT architecture that is meant to more effectively handle morphologically rich languages.
+We evaluate KinyaBERT on Kinyarwanda, a low resource morphologically rich language, which is spoken by more than twelve million people across Eastern and Central Africa.
+The input to the model is either a sentence or a document.
+For example here, we have John twarahamubonye biradutangaza, which means we were surprised to find John there.
+As you can see, Kinyarwanda words contains several morphemes that contain different information in them.
+Therefore, in our model, we pass this sentence or a document to a morphological analyzer.
+Which then generates morphemes contained in each of the words.
+The morphemes usually are made of the stem and zero or more affixes.
+The affixes may indicate tense, aspect, subject or object in verbs, and more often relates to the Bantu noun class for subjects and objects.
+The morphological analyzer also produces a part of speech tag for each of the words.
+After this step, we make embeddings for the spee- for the part of speech tags.
+Embeddings for the affixes.
+And embeddings for the stem.
+These are the morphology level, these are the morphology level embeddings.
+We then pass these embeddings through a morphology encoder, which is a small transformer encoder that is applied to each word independently.
+The output of the are the vectors that are contextualized with the morphological information at each word.
+Now, we perform composition where the morphological embeddings corresponding to part of speech and stem are concatenated together.
+We further concat we further concatenate them with another stem embedding at the sentence level.
+Then we form an input to the main sentence or document encoder.
+The final output are contextualized embeddings that can be used for downstream NLP tasks.
+For a morphological analyzer, we use finite state two level morphology principles with custom implementation that is tailored to the Kinyarwanda language.
+We effectively model the morphology of all Kinyarwanda words, including verbals, nouns, demonstrative and possessive pronouns, numerals, and others.
+We use an unsupervised part of speech tagging algorithm.
+A first order factored model is used to account for morphology probability, basically the probability that is assigned by the morphological analyzer.
+We also take into consideration the part of speech tag precedence as well as the syntactic agreements that are present in the in the input words.
+The part of speech tagger uses a bidi bidirectional inference which improves upon the more often used Viterbi algorithm for decoding.
+A few remarks here for positional encoding.
+One, the morphology encoder does not use any positional encoding.
+This is because each of the morphemes occupies a known slot in the morphological model.
+Therefore, positional information is inherent when the morphemes are given.
+Second, the sentence encoder uses the so-called untied relative positional embeddings, which have been recently published at ICLR conference.
+This positional embeddings essentially disentangles positional correlations from token to token attention computation.
+Similar to BERT, we use a masked language model pre-training objective.
+Essentially we have to predict both the stem and the affixes that are associated with the words.
+During pre-training, fifteen percent of all words are considered for prediction, of which eighty percent are masked, ten percent are swapped with random words, and ten percent are left unchanged.
+For affix prediction, we face some multi label classification problem.
+For this, we either group together affixes into a fixed number of sets and predict the set as a class label.
+The other option is to predict the affix probability vector.
+We evaluate both of these approaches in our experiments.
+We pre-train KinyaBERT on about two and half gigabytes of Kinyarwanda text, and compare it to three baseline models.
+One is a multilingual model called XLM-R, that is trained on a large text corpora that is made of multiple languages.
+The other two baselines are pretrained on the same Kinyarwanda text using either the byte pair encoding algorithm or using morphological analysis without using the two tier transformer encoder architecture.
+All models are configured in the base architecture, which is about between a hundred and a hundred and ten million parameters, with Kinyarwanda with KinyaBERT using the least number of parameters.
+All models except the multilingual are pretrained for thirty two thousand gradient updates with a batch size of two thousand five hundred and sixty sequences in each batch.
+We evaluate the pretrained models on three sets of tasks.
+One is the GLUE benchmark which has often been used for evaluating the effectiveness of pretrained language models.
+We obtain our GLUE benchmark data by translating the original benchmark data into Kinyarwanda using Google Translate.
+The second task is Kinyarwanda named entity recognition benchmark, which is a high quality dataset that was annotated by trained native speakers.
+The third one is a news categorization task where we pull news articles from several websites and collecting their categorization tags that were assigned by the authors and then essentially trying to predict the same, the the same categories.
+And now we go to the results.
+For the GLUE benchmark, we find that KinyaBERT consistently outperforms baseline models.
+Here we show the average performance for ten finetuning runs.
+We also run a user evaluation of the translations that are produced by Google Translate.
+Essentially, user users rated about six thousand examples, assigning scores on a scale from one to four, assessing the quality of the translations.
+The result is that many translations were noisy.
+But, all models had to cope with the same translation noise, and the relative performance between the models is still important to notice.
+For the named entity recognition task, we also find that KinyaBERT gives the best performance with the affix distribution regression variant performing best.
+These results are also averages of ten finetuning runs.
+For the news categorization task, we find mixed results.
+Previous work on text classification for Kinyarwanda had found that simple keyword detection is mostly enough for solving this specific task.
+Therefore, there is less gain from using pretrained language models.
+On this particular task of news categorization.
+We also conducted an ablation study to see if there are alternative structures that improve performance.
+For the GLUE benchmark, we find that using affix sets consistently performs better, while affix probability regression objective yields the best performance on named entity recognition.
+Also by looking at the low scores for finetuning, we find that KinyaBERT has better convergence in most cases.
+So to conclude, this work has demonstrated the effectiveness of explicitly using morphological information in pretrained language models.
+The proposed two tier transformer encoder architecture enables capturing morphological complexity morphological compositionality, which is an important aspect of morphologically rich languages.
+These findings should motivate further research into morphology aware language pretrained language models.

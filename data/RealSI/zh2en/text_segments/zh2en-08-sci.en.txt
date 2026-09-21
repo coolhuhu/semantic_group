@@ -1,0 +1,88 @@
+OK. Apart from that, there is another question: the size of the sun,
+or the radius of the sun.
+Can you see it?
+For the radius of the sun, generally speaking, we don't need many decimal points.
+700,000 kilometers.
+The radius of the sun is 700,000 kilometers,
+and after calculation, its diameter is 1,400,000 kilometers.
+This is the size of the sun, right?
+The third one, the mass of the sun.
+2×10^30 kilograms.
+It's very clear on this picture.
+There is a mark here.
+Both M and R have a subscript after them
+- a circle with a dot.
+Please note that
+this subscript is a specialized symbol,
+only referring to the sun.
+If you are referring to the mass of other stuff, just refer to it.
+But don't put this symbol under the mass.
+It only refers to the mass
+and radius of the sun
+and cannot be used elsewhere.
+It's a specialized symbol.
+As to the position of the sun,
+it's, as just mentioned, within a spiral arm 32,600 light years away from the center of the Milky Way.
+The Milky Way is a spiral galaxy.
+It's about 26 light years north of the galactic plane.
+What does it mean?
+We know that according to the usual rule of up north and down south.
+If you find the central plane of the Milky Way,
+26 light years north above the central plane,
+the sun is there.
+Studies have found that
+the position of the sun in the Milky Way is very ordinary
+and nothing special.
+It is neither on the central plane
+nor at a certain important position.
+There are so many such celestial bodies in the Milky Way
+that even the sun is no surprise, right?
+How many stars are there in the Milky Way?
+We don't know.
+No one can count that.
+If you just want a rough number:
+it's about one hundred billion,
+then if you were to ask, how many stars are there in the universe exactly?
+This is a question that most people can't answer.
+As a rule, we suppose that each galaxy has one hundred billion stars.
+And how many galaxies have we discovered now?
+About tens of billions.
+As such, it's impossible to describe it with a specific figure.
+Someone has made an appropriate metaphor.
+That is, if a grain of sand on the earth
+corresponds to one million stars in the universe,
+you just need to see how many grains of sand there are on the earth
+to calculate how many stars there are in the universe.
+Motion.
+Besides moving with other stars in the spiral arm around the center of the Milky Way,
+the sun also makes a translational motion of about 20 kilometers per second relative to the surrounding stars.
+OK, let's take a look at a very important solar parameter,
+called solar constant.
+First, the solar constant refers to the amount of energy per unit time, per unit area, that is vertically incident on the earth's atmosphere from outside.
+It is represented by a lowercase f.
+Similarly, since this lowercase f is a special constant of the sun, it is denoted as f☉.
+Neglect its magnitude.
+It doesn't matter.
+But this figure is extremely, extremely important.
+I don't know if you have any thoughts after seeing this figure.
+If it was a long time ago,
+and you were the first one
+on earth to obtain this data,
+what would you do?
+You will stare at the figure and think to yourself,
+"Incredible!
+Now I can write an article to be published in Nature,"
+isn't it?
+"I discovered something new."
+Will you be this complacent?
+In fact, you can obtain a lot from this figure.
+Have you ever thought about it?
+Let's take a look again.
+What is the solar constant?
+The amount of energy perpendicularly incident on a unit area outside the earth's atmosphere per unit time,
+Picture this in your mind:
+visualize a large sphere, taking the center of the sun as the center
+and the distance from the sun to outer edge of the earth's atmosphere as its radius, alright?
+Then on this large sphere, if we assume that the radiation of the sun is uniform and isotropic,
+the energy passing through each unit area on this large sphere per second would be revealed,
+isn't it?
