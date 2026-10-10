@@ -294,6 +294,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--source-key", default="src", help="field containing source text")
     parser.add_argument("--reference-key", default="ref", help="field containing reference translation")
     parser.add_argument("--translation-key", default="mt", help="field containing model translation/result")
+    parser.add_argument(
+        "--write-empty-groups",
+        action="store_true",
+        help="also write empty JSON files for groups absent from this run",
+    )
     return parser.parse_args()
 
 
@@ -407,6 +412,9 @@ def main() -> None:
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     for group, filename in GROUP_FILES.items():
+        if not output_rows[group] and not args.write_empty_groups:
+            print("{}: 0 documents, skipped (existing output preserved)".format(group))
+            continue
         output_path = args.output_dir / filename
         write_json(output_path, output_rows[group])
         print("{}: {} documents -> {}".format(group, len(output_rows[group]), output_path))
