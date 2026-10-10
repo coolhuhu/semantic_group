@@ -176,3 +176,66 @@ summary.json
 - `all_audio_macro_mean`：把四个数据集的所有音频放在一起计算的均值。
 
 第二个脚本需要当前 Python 环境已经安装 `unbabel-comet` 及其 PyTorch 依赖。
+
+
+## 从官方 ACL6060 gold 分段生成文本 sidecar
+
+`prepare_acl_gold_sidecars.py` 根据官方 `sent_<id>.wav` 与英、中 XML 中相同的 `<seg id>`，为每段 WAV 生成同名文件：
+
+```text
+sent_1.wav
+sent_1.txt
+sent_1.translation
+```
+
+其中 `.txt` 保存英文原文，`.translation` 保存中文参考译文。脚本还会生成 `acl_gold_manifest.json`，记录每个 `sent_<id>` 所属的原始 `docid` 和文档内 segment 序号。
+
+先对 dev 做只读检查，不写文件：
+
+```bash
+cd /data/baizhihao/tmp/semantic_group
+
+python3 prepare_acl_gold_sidecars.py \
+  --wav-dir /data/baizhihao/datasets/ACL60/2/acl_6060/dev/segmented_wavs/gold \
+  --source-xml /data/baizhihao/datasets/ACL60/2/acl_6060/dev/text/xml/ACL.6060.dev.en-xx.en.xml \
+  --dry-run
+```
+
+确认检查通过后，去掉 `--dry-run`，文件会直接写到 gold WAV 目录：
+
+```bash
+python3 prepare_acl_gold_sidecars.py \
+  --wav-dir /data/baizhihao/datasets/ACL60/2/acl_6060/dev/segmented_wavs/gold \
+  --source-xml /data/baizhihao/datasets/ACL60/2/acl_6060/dev/text/xml/ACL.6060.dev.en-xx.en.xml
+```
+
+中文 XML 默认由英文 XML 文件名自动推断为同目录下的 `.zh.xml`。也可以显式指定：
+
+```bash
+--translation-xml /path/to/ACL.6060.dev.en-xx.zh.xml
+```
+
+eval 的使用方式相同，只需把路径中的 `dev` 改为 `eval`。如果已有同名 sidecar 且内容不同，脚本默认停止并保留原文件；确认需要替换时才加 `--overwrite`。
+
+官方 WAV 的推理结果使用 `sent_N` 作为 `wav_id`，合并整篇翻译时需要把 manifest 传给 `merge_segment_predictions.py`：
+
+```bash
+python3 merge_segment_predictions.py \
+  --input acl_dev=/path/to/acl_dev_predictions.json \
+  --segment-manifest acl_dev=/data/baizhihao/datasets/ACL60/2/acl_6060/dev/segmented_wavs/gold/acl_gold_manifest.json \
+  --output-dir /path/to/merged
+```
+
+同时处理 dev 和 eval 时分别传入两份 manifest：
+
+```bash
+python3 merge_segment_predictions.py \
+  --input \
+  acl_dev=/path/to/acl_dev_predictions.json \
+  acl_eval=/path/to/acl_eval_predictions.json \
+  --segment-manifest acl_dev=/path/to/dev/acl_gold_manifest.json \
+  --segment-manifest acl_eval=/path/to/eval/acl_gold_manifest.json \
+  --output-dir /path/to/merged
+```
+
+`score_document_comet.py` 的输入格式没有变化，不需要修改使用方法。
